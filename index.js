@@ -1,3 +1,11 @@
+const formatTime = (date) => {
+  return date.toLocaleTimeString('en-US', { 
+      hour: '2-digit', 
+      minute: '2-digit',
+      hour12: true 
+  });
+};
+
 const getDefaultParams = () => {
   return {
     locationId: 5020,
@@ -69,17 +77,53 @@ const getAvailableAppointments = async () => {
 };
 
 const draw = async () => {
-  const params = getQueryParams();
-  const availableAppointments = await getAvailableAppointments();
-  if (availableAppointments.length === 0) {
-    availableAppointments.push("No appointments available");
+  const loading = document.getElementById('loading');
+  const results = document.getElementById('results');
+  const error = document.getElementById('error');
+  const appointmentsList = document.getElementById('appointmentsList');
+  const locationIdSpan = document.getElementById('locationId');
+
+  // Show loading, hide others
+  loading.classList.remove('hidden');
+  results.classList.add('hidden');
+  error.classList.add('hidden');
+
+  try {
+      const params = getQueryParams();
+      locationIdSpan.textContent = params.get('locationId');
+      
+      const availableAppointments = await getAvailableAppointments();
+      
+      appointmentsList.innerHTML = '';
+      
+      if (availableAppointments.length === 0) {
+          appointmentsList.innerHTML = `
+              <li class="py-3 text-center text-gray-500">
+                  No appointments available
+              </li>
+          `;
+      } else {
+          availableAppointments.forEach(time => {
+              const li = document.createElement('li');
+              li.className = 'py-3 flex items-center';
+              li.innerHTML = `
+                  <span class="text-gray-800">${formatTime(new Date(time))}</span>
+              `;
+              appointmentsList.appendChild(li);
+          });
+      }
+
+      // Hide loading, show results
+      loading.classList.add('hidden');
+      results.classList.remove('hidden');
+
+  } catch (err) {
+      // Show error state
+      loading.classList.add('hidden');
+      error.classList.remove('hidden');
+      document.getElementById('errorMessage').textContent = 
+          `Error loading appointments: ${err.message}`;
   }
-  document.write(`
-<pre>
-Following appointments available:
-${availableAppointments.join("\n")}
-</pre>
-      `);
 };
 
 draw();
