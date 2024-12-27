@@ -72,8 +72,7 @@ const getAvailableAppointments = async () => {
   const data = await response.json();
   return data
     .filter((slot) => slot.active)
-    .map((slot) => new Date(slot.timestamp))
-    .map((timestamp) => `${timestamp.getHours()}:${timestamp.getMinutes()}`);
+    .map((slot) => new Date(slot.timestamp));
 };
 
 const draw = async () => {
