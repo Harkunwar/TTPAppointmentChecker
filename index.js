@@ -125,4 +125,22 @@ const draw = async () => {
   }
 };
 
+const setupAutoReload = () => {
+  const autoReloadCheckbox = document.getElementById('autoReload');
+  let intervalId;
+
+  autoReloadCheckbox.addEventListener('change', () => {
+    if (autoReloadCheckbox.checked) {
+      intervalId = setInterval(() => {
+        // Show loading spinner before reloading
+        document.getElementById('loading').classList.remove('hidden');
+        draw();
+      }, 15000);
+    } else {
+      clearInterval(intervalId);
+    }
+  });
+};
+
 draw();
+setupAutoReload();
